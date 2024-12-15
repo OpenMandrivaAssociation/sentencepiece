@@ -1,5 +1,9 @@
 %define _disable_ld_no_undefined 1
 
+
+%define libname %mklibname sentencepiece
+%define devname %mklibname -d sentencepiece
+
 Name:		sentencepiece
 Version:	0.2.0
 Release:	1
@@ -26,32 +30,32 @@ extension of direct training from raw sentences.
 SentencePiece allows us to make a purely end-to-end system that does not
 depend on language-specific pre/post-processing.
 
-%package libs
+%package -n %{libname}
 Summary:	Runtime libraries for SentencePiece
 
-%description libs
+%description -n %{libname}
 This package contains the libraries for SentencePiece.
 
 %package tools
 Summary:	Tools for SentencePiece
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires:	%{libname} = %{EVRD}
 
 %description tools
 This package contains tools for manipulate models for SentencePiece.
 
-%package devel
+%package -n %{devname}
 Summary:	Libraries and header files for SentencePiece
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires:	%{libname} = %{EVRD}
 
-%description devel
+%description -n %{devname}
 This package contains header files to develop a software using SentencePiece.
 
-%package        -n python3-%{name}
+%package        -n python-%{name}
 Summary:	Python module for SentencePiece
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires:	%{libname} = %{EVRD}
 %{?python_provide:%python_provide python3-%{name}}
 
-%description -n python3-%{name}
+%description -n python-%{name}
 This package contains Python3 module file for SentencePiece.
 
 %prep
@@ -65,27 +69,23 @@ This package contains Python3 module file for SentencePiece.
 cd ..
 cd python
 %py_build
-#pushd python
-#CFLAGS="-I../src" LDFLAGS="-L../%{_vpath_builddir}/src -lsentencepiece" PKG_CONFIG_PATH="../%{_vpath_builddir}" %py3_build
-#popd
 cd ..
 
 %install
 %make_install -C build
 cd python
-#pushd python
-%py3_install
-#popd
+%py_install
 cd ..
 
+# remove static
 rm %{buildroot}%{_libdir}/libsentencepiece*.a
 
-%files libs
+%files -n %{libname}
 %doc README.md
 %license LICENSE
 %{_libdir}/libsentencepiece*.so.0*
 
-%files devel
+%files -n %{devname}
 %{_includedir}/sentencepiece*.h
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/sentencepiece*.pc
@@ -93,10 +93,6 @@ rm %{buildroot}%{_libdir}/libsentencepiece*.a
 %files tools
 %{_bindir}/spm*
 
-%files -n python3-%{name}
-%{python3_sitearch}/%{name}/
-%{python3_sitearch}/%{name}-*.egg-info/
-
-
-%changelog
-%autochangelog
+%files -n python-%{name}
+%{python_sitearch}/%{name}/
+%{python_sitearch}/%{name}-*.egg-info/
