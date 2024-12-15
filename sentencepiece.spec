@@ -61,16 +61,17 @@ This package contains Python3 module file for SentencePiece.
 
 %make_build
 
-pushd python
-CFLAGS="-I../src" LDFLAGS="-L../%{_vpath_builddir}/src -lsentencepiece" PKG_CONFIG_PATH="../%{_vpath_builddir}" %py3_build
-popd
+%py_build
+#pushd python
+#CFLAGS="-I../src" LDFLAGS="-L../%{_vpath_builddir}/src -lsentencepiece" PKG_CONFIG_PATH="../%{_vpath_builddir}" %py3_build
+#popd
 
 %install
 %make_install -C build
 
-pushd python
+#pushd python
 %py3_install
-popd
+#popd
 
 rm %{buildroot}%{_libdir}/libsentencepiece*.a
 
