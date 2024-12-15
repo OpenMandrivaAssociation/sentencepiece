@@ -1,22 +1,17 @@
 Name:		sentencepiece
-Version:	0.1.99
-Release:	%autorelease
+Version:	0.2.0
+Release:	1
 Summary:	An unsupervised text tokenizer for Neural Network-based text generation
 
 License:	Apache-2.0
 URL:		https://github.com/google/sentencepiece
 Source0:	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
-# https://github.com/google/sentencepiece/issues/860
-ExcludeArch:    s390x
-
-BuildRequires:	gcc-c++
 BuildRequires:	cmake
-BuildRequires:	ninja-build
 BuildRequires:	gperftools-devel
 BuildRequires:	pkgconfig
-BuildRequires:	python3-devel
-BuildRequires:	python3-setuptools
+BuildRequires:	python-devel
+BuildRequires:	python-setuptools
 
 %description
 The SentencePiece is an unsupervised text tokenizer for Neural Network-based
@@ -62,17 +57,16 @@ This package contains Python3 module file for SentencePiece.
 
 %build
 %cmake \
-    -GNinja \
     -DCMAKE_BUILD_TYPE=Release \
 
-%cmake_build
+%make_build
 
 pushd python
 CFLAGS="-I../src" LDFLAGS="-L../%{_vpath_builddir}/src -lsentencepiece" PKG_CONFIG_PATH="../%{_vpath_builddir}" %py3_build
 popd
 
 %install
-%cmake_install
+%make_install -C build
 
 pushd python
 %py3_install
