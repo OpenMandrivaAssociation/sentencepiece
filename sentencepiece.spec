@@ -60,18 +60,20 @@ This package contains Python3 module file for SentencePiece.
     -DCMAKE_BUILD_TYPE=Release \
 
 %make_build
-
+cd python
 %py_build
 #pushd python
 #CFLAGS="-I../src" LDFLAGS="-L../%{_vpath_builddir}/src -lsentencepiece" PKG_CONFIG_PATH="../%{_vpath_builddir}" %py3_build
 #popd
+cd..
 
 %install
 %make_install -C build
-
+cd python
 #pushd python
 %py3_install
 #popd
+cd..
 
 rm %{buildroot}%{_libdir}/libsentencepiece*.a
 
