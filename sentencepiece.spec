@@ -60,6 +60,7 @@ This package contains Python3 module file for SentencePiece.
     -DCMAKE_BUILD_TYPE=Release \
 
 %make_build
+cd..
 cd python
 %py_build
 #pushd python
