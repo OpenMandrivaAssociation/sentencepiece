@@ -13,6 +13,7 @@ License:	Apache-2.0
 URL:		https://github.com/google/sentencepiece
 Source0:	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
+BuildRequires:  make
 BuildRequires:	cmake
 BuildRequires:	gperftools-devel
 BuildRequires:	pkgconfig
