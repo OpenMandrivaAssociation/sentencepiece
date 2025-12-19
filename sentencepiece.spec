@@ -6,7 +6,7 @@
 
 Name:		sentencepiece
 Version:	0.2.0
-Release:	1
+Release:	2
 Summary:	An unsupervised text tokenizer for Neural Network-based text generation
 
 License:	Apache-2.0
@@ -17,7 +17,7 @@ BuildRequires:	cmake
 BuildRequires:	gperftools-devel
 BuildRequires:	pkgconfig
 BuildRequires:	python-devel
-BuildRequires:	python-setuptools
+BuildRequires:	python%{pyver}dist(setuptools)
 
 %description
 The SentencePiece is an unsupervised text tokenizer for Neural Network-based
