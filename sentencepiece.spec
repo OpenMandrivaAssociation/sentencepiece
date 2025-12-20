@@ -19,6 +19,7 @@ BuildRequires:	gperftools-devel
 BuildRequires:	pkgconfig
 BuildRequires:	python-devel
 BuildRequires:	python%{pyver}dist(setuptools)
+BuildRequires:	python%{pyver}dist(pip)
 
 %description
 The SentencePiece is an unsupervised text tokenizer for Neural Network-based
