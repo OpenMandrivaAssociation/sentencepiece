@@ -97,4 +97,4 @@ rm %{buildroot}%{_libdir}/libsentencepiece*.a
 
 %files -n python-%{name}
 %{python_sitearch}/%{name}/
-#{python_sitearch}/%{name}-*.egg-info/
+%{python_sitearch}/sentencepiece-%{version}.dist-info
