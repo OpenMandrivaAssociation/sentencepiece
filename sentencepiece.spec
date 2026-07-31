@@ -5,7 +5,7 @@
 %define devname %mklibname -d sentencepiece
 
 Name:		sentencepiece
-Version:	0.2.1
+Version:	0.2.2
 Release:	1
 Summary:	An unsupervised text tokenizer for Neural Network-based text generation
 
