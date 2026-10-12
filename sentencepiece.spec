@@ -13,6 +13,7 @@ License:	Apache-2.0
 Group:	Development/Other
 URL:		https://github.com/google/sentencepiece
 Source0:	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:		sentencepiece-shared-python.patch
 
 BuildRequires:  make
 BuildRequires:	cmake
@@ -25,6 +26,7 @@ BuildRequires:	pkgconfig(protobuf)
 BuildRequires:	pkgconfig(python)
 BuildRequires:	python%{pyver}dist(setuptools)
 BuildRequires:	python%{pyver}dist(pip)
+BuildRequires:	python%{pyver}dist(pybind11)
 
 %description
 The SentencePiece is an unsupervised text tokenizer for Neural Network-based
@@ -66,7 +68,7 @@ Requires:	%{libname} = %{EVRD}
 This package contains Python3 module file for SentencePiece.
 
 %prep
-%autosetup
+%autosetup -p1
 # The release tarball ships an Abseil that does not build with this
 # compiler. CMake links third_party/absl to the system headers only when
 # that directory is missing, and this tree already contains it.
