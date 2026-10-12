@@ -18,7 +18,9 @@ BuildRequires:  make
 BuildRequires:	cmake
 BuildRequires:	gperftools-devel
 BuildRequires:	pkgconfig
-BuildRequires:	python-devel
+BuildRequires:	cmake(absl)
+BuildRequires:	cmake(protobuf)
+BuildRequires:	pkgconfig(python)
 BuildRequires:	python%{pyver}dist(setuptools)
 BuildRequires:	python%{pyver}dist(pip)
 
@@ -67,6 +69,8 @@ This package contains Python3 module file for SentencePiece.
 %build
 %cmake \
     -DCMAKE_BUILD_TYPE=Release \
+    -DSPM_ABSL_PROVIDER=package \
+    -DSPM_PROTOBUF_PROVIDER=package \
 
 %make_build
 cd ..
