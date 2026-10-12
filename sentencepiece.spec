@@ -70,8 +70,10 @@ This package contains Python3 module file for SentencePiece.
 # The release tarball ships an Abseil that does not build with this
 # compiler. CMake links third_party/absl to the system headers only when
 # that directory is missing, and this tree already contains it.
+# The system Abseil aliases std:: ordering types, which exist only in C++20.
 rm -rf third_party/absl
 ln -s %{_includedir}/absl third_party/absl
+sed -i 's/set(CMAKE_CXX_STANDARD 17)/set(CMAKE_CXX_STANDARD 20)/' CMakeLists.txt
 
 %build
 %cmake \
