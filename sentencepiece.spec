@@ -6,10 +6,11 @@
 
 Name:		sentencepiece
 Version:	0.2.2
-Release:	1
+Release:	2
 Summary:	An unsupervised text tokenizer for Neural Network-based text generation
 
 License:	Apache-2.0
+Group:	Development/Other
 URL:		https://github.com/google/sentencepiece
 Source0:	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
