@@ -19,7 +19,9 @@ BuildRequires:	cmake
 BuildRequires:	gperftools-devel
 BuildRequires:	pkgconfig
 BuildRequires:	cmake(absl)
-BuildRequires:	cmake(protobuf)
+# cmake itself provides cmake(protobuf) via its find module, which does
+# not install the library. The pc file is only in the devel package.
+BuildRequires:	pkgconfig(protobuf)
 BuildRequires:	pkgconfig(python)
 BuildRequires:	python%{pyver}dist(setuptools)
 BuildRequires:	python%{pyver}dist(pip)
