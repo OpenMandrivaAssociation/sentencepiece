@@ -67,6 +67,11 @@ This package contains Python3 module file for SentencePiece.
 
 %prep
 %autosetup
+# The release tarball ships an Abseil that does not build with this
+# compiler. CMake links third_party/absl to the system headers only when
+# that directory is missing, and this tree already contains it.
+rm -rf third_party/absl
+ln -s %{_includedir}/absl third_party/absl
 
 %build
 %cmake \
