@@ -5,8 +5,8 @@
 %define devname %mklibname -d sentencepiece
 
 Name:		sentencepiece
-Version:	0.2.2
-Release:	2
+Version:	0.2.3
+Release:	1
 Summary:	An unsupervised text tokenizer for Neural Network-based text generation
 
 License:	Apache-2.0
@@ -14,6 +14,7 @@ Group:	Development/Other
 URL:		https://github.com/google/sentencepiece
 Source0:	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Patch0:		sentencepiece-shared-python.patch
+Patch1:		sentencepiece-system-flatbuffers.patch
 
 BuildRequires:  make
 BuildRequires:	cmake
@@ -23,6 +24,7 @@ BuildRequires:	cmake(absl)
 # cmake itself provides cmake(protobuf) via its find module, which does
 # not install the library. The pc file is only in the devel package.
 BuildRequires:	pkgconfig(protobuf)
+BuildRequires:	pkgconfig(flatbuffers)
 BuildRequires:	pkgconfig(python)
 BuildRequires:	python%{pyver}dist(setuptools)
 BuildRequires:	python%{pyver}dist(pip)
@@ -69,19 +71,14 @@ This package contains Python3 module file for SentencePiece.
 
 %prep
 %autosetup -p1
-# The release tarball ships an Abseil that does not build with this
-# compiler. CMake links third_party/absl to the system headers only when
-# that directory is missing, and this tree already contains it.
-# The system Abseil aliases std:: ordering types, which exist only in C++20.
-rm -rf third_party/absl
-ln -s %{_includedir}/absl third_party/absl
-sed -i 's/set(CMAKE_CXX_STANDARD 17)/set(CMAKE_CXX_STANDARD 20)/' CMakeLists.txt
 
 %build
 %cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DSPM_ABSL_PROVIDER=package \
     -DSPM_PROTOBUF_PROVIDER=package \
+    -DSPM_FLATBUFFERS_PROVIDER=package \
+    -DSPM_ENABLE_LITE=OFF \
 
 %make_build
 cd ..
@@ -107,6 +104,7 @@ rm %{buildroot}%{_libdir}/libsentencepiece*.a
 %{_includedir}/sentencepiece*.h
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/sentencepiece*.pc
+%{_libdir}/cmake/sentencepiece
 
 %files tools
 %{_bindir}/spm*

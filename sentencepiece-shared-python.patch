@@ -1,18 +1,24 @@
---- a/python/setup.py	2026-10-13 00:37:31.755685561 +0200
-+++ b/python/setup.py	2026-10-13 00:40:35.121863004 +0200
-@@ -104,51 +104,31 @@
-   """Override build_extension to run cmake."""
+--- a/python/setup.py	2026-11-12 18:17:00.077713063 +0100
++++ b/python/setup.py	2026-11-12 18:17:00.086307969 +0100
+@@ -96,64 +96,41 @@
+ 
+ 
+ class build_ext_unix(_build_ext):
+-  """Override build_extension to run cmake."""
++  """Override build_extension to link the distro shared libraries."""
  
    def build_extension(self, ext):
--    cflags, libs = get_cflags_and_libs('../build/root')
--    abseil_libs = find_abseil_lib('../build/third_party')
--    cflags.extend(find_absl_include(is_msvc=False))
+-    cflags, libs = get_cflags_and_libs('../build')
+-    abseil_libs = find_abseil_lib('../build')
 -
 -    if len(libs) == 0:
--      subprocess.check_call(['./build_bundled.sh', __version__])
--      cflags, libs = get_cflags_and_libs('./build/root')
--      abseil_libs = find_abseil_lib('./build/third_party')
--      cflags.extend(find_absl_include(is_msvc=False))
+-      cflags, libs = get_cflags_and_libs('./build')
+-      abseil_libs = find_abseil_lib('./build')
+-
+-    if len(libs) == 0:
+-      subprocess.check_call(['./build_bundled.sh'])
+-      cflags, libs = get_cflags_and_libs('./build')
+-      abseil_libs = find_abseil_lib('./build')
 -
 -    # Fix compile on some versions of Mac OSX
 -    # See: https://github.com/neulab/xnmt/issues/199
@@ -27,51 +33,65 @@
 -      libs.extend(abseil_libs)
 -      libs.append('-Wl,-dead_strip')
 -      libs.append('-Wl,-exported_symbols_list,exports_mac.txt')
+-    elif sys.platform == 'aix':
+-      #  non GNU linker
+-      libs.extend(abseil_libs)
+-      libs.append('-Wl,-bE:exports_aix.txt')
+-      cflags.append('-Wl,-s')
+-      libs.append('-Wl,-s')
+-      libs.append('-fopenmp')
+-      cflags.append('-fopenmp')
 -    else:
 -      # GNU linker
--      libs.append('-Wl,--start-group')
--      libs.extend(abseil_libs)
--      libs.append('-Wl,--end-group')
+-      libs = (
+-          ['-Wl,--start-group']
+-          + libs
+-          + abseil_libs
+-          + ['-lgomp', '-Wl,--end-group']
+-      )
 -      libs.append('-Wl,--gc-sections')
 -      libs.append('-Wl,--version-script=exports.txt')
--      if sys.platform == 'aix':
--        cflags.append('-Wl,-s')
--        libs.append('-Wl,-s')
--      else:
--        cflags.append('-Wl,-strip-all')
--        libs.append('-Wl,-strip-all')
+-      cflags.append('-Wl,-strip-all')
+-      libs.append('-Wl,-strip-all')
 -
 -    if sys.platform == 'linux':
 -      libs.append('-Wl,-Bsymbolic')
+-      libs.append('-fopenmp')
+-      cflags.append('-fopenmp')
 -
-+    # Distro build: link the module to the shared library just produced by
-+    # cmake. build_bundled.sh fetches Abseil with git, which is not available.
++    # Upstream links static archives and, if those are missing, runs
++    # build_bundled.sh, which fetches Abseil and Protobuf with git.
++    # The rpm build has just produced shared libraries and has no network.
 +    root = os.path.normpath('..')
++    build = os.path.normpath(os.path.join(root, 'build'))
 +    cflags = [
 +        '-std=c++20',
-+        '-I' + root,
 +        '-I' + os.path.normpath(os.path.join(root, 'src')),
-+        '-I' + os.path.normpath(os.path.join(root, 'build')),
-+        '-I' + os.path.normpath(os.path.join(root, 'build/src')),
++        '-I' + os.path.normpath(os.path.join(build, 'src')),
++        '-I' + os.path.normpath(os.path.join(root, 'lite')),
 +        '-I' + os.path.normpath(os.path.join(root, 'third_party')),
 +        '-Wno-unused-function',
 +    ]
++    cflags.extend(subprocess.check_output(
++        ['pkg-config', '--cflags', 'absl_status', 'protobuf'],
++        text=True).split())
      if is_gil_disabled():
        cflags.append('-DPy_GIL_DISABLED')
--
+ 
 -    cflags.append('-Wno-unused-function')
--
-+    libdir = os.path.normpath(os.path.join(root, 'build/src'))
++    libdir = os.path.normpath(os.path.join(build, 'src'))
 +    libs = [
 +        '-L' + libdir,
 +        '-Wl,-rpath-link,' + libdir,
 +        '-lsentencepiece_train',
 +        '-lsentencepiece',
 +        '-lprotobuf',
++        '-lflatbuffers',
 +    ]
 +    libs.extend(subprocess.check_output(
-+        ['pkg-config', '--libs', 'absl_status', 'absl_strings', 'absl_span'],
++        ['pkg-config', '--libs',
++         'absl_status', 'absl_strings', 'absl_span', 'absl_synchronization'],
 +        text=True).split())
+ 
      print('## cflags={}'.format(' '.join(cflags)))
      print('## libs={}'.format(' '.join(libs)))
-     ext.extra_compile_args = cflags

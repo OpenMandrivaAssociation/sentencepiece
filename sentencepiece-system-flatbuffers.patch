@@ -1,0 +1,20 @@
+--- a/CMakeLists.txt	2026-11-12 18:17:00.063948285 +0100
++++ b/CMakeLists.txt	2026-11-12 18:17:00.069760033 +0100
+@@ -256,6 +256,17 @@
+ endif()
+ 
+ # FlatBuffers
++set(SPM_FLATBUFFERS_PROVIDER "module" CACHE STRING "Provider of flatbuffers library")
++set_property(CACHE SPM_FLATBUFFERS_PROVIDER PROPERTY STRINGS "module" "package")
++if (SPM_FLATBUFFERS_PROVIDER STREQUAL "package" AND NOT TARGET flatbuffers)
++  find_package(flatbuffers REQUIRED CONFIG)
++  if (NOT TARGET flatbuffers)
++    add_library(flatbuffers ALIAS flatbuffers::flatbuffers_shared)
++  endif()
++  if (NOT TARGET flatc)
++    add_executable(flatc ALIAS flatbuffers::flatc)
++  endif()
++endif()
+ if (NOT TARGET flatbuffers)
+   include(FetchContent)
+   set(FLATBUFFERS_BUILD_TESTS OFF CACHE BOOL "Disable flatbuffers tests" FORCE)
